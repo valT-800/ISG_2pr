@@ -8,7 +8,9 @@ namespace Uzd_N2
 {
     class Repository
     {
-
+        private const int AesBlockByteSize = 128 / 8;
+        private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();
+        private static byte[] IV = new byte[16] { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
         public static string CBCEncryptStringToBytes(string plainText, string password)
         {
             //transform key to bytes
@@ -16,48 +18,54 @@ namespace Uzd_N2
 
             Aes aes = Aes.Create();
             
+            aes.Mode = CipherMode.CBC;
+
             // Set key and IV
-            byte[] aesKey = new byte[32];
+            byte[] aesKey = new byte[16];
+
+            Array.Copy(Key, 0, aesKey, 0, 16);
+            aes.Key = Key;
+            aes.Key = aesKey;
             
-                Array.Copy(Key, 0, aesKey, 0, 32);
-                aes.Key = Key;
-                aes.Key = aesKey;
-                aes.GenerateIV();
+            IV = GenerateRandomBytes(AesBlockByteSize);
+            aes.IV = IV;        
 
-                aes.Mode = CipherMode.CBC;
+            StreamWriter f = new StreamWriter("iv.txt");
+            f.WriteLine(Convert.ToBase64String(aes.IV, 0, aes.IV.Length));
+            f.Close();
 
-                // Instantiate a new MemoryStream object to contain the encrypted bytes
-                MemoryStream memoryStream = new MemoryStream();
+            // Instantiate a new MemoryStream object to contain the encrypted bytes
+            MemoryStream memoryStream = new MemoryStream();
 
-                // Instantiate a new encryptor from our Aes object
-                ICryptoTransform aesEncryptor = aes.CreateEncryptor();
+            // Instantiate a new encryptor from our Aes object
+            ICryptoTransform aesEncryptor = aes.CreateEncryptor();
 
-                // Instantiate a new CryptoStream object to process the data and write it to the 
-                // memory stream
-                CryptoStream cryptoStream = new CryptoStream(memoryStream, aesEncryptor, CryptoStreamMode.Write);
+            // Instantiate a new CryptoStream object to process the data and write it to the 
+            // memory stream
+            CryptoStream cryptoStream = new CryptoStream(memoryStream, aesEncryptor, CryptoStreamMode.Write);
 
-                // Convert the plainText string into a byte array
-                byte[] plainBytes = Encoding.ASCII.GetBytes(plainText);
+            // Convert the plainText string into a byte array
+            byte[] plainBytes = Encoding.ASCII.GetBytes(plainText);
 
-                // Encrypt the input plaintext string
-                cryptoStream.Write(plainBytes, 0, plainBytes.Length);
+            // Encrypt the input plaintext string
+            cryptoStream.Write(plainBytes, 0, plainBytes.Length);
 
-                // Complete the encryption process
-                cryptoStream.FlushFinalBlock();
+            // Complete the encryption process
+            cryptoStream.FlushFinalBlock();
 
-                // Convert the encrypted data from a MemoryStream to a byte array
-                byte[] cipherBytes = memoryStream.ToArray();
+            // Convert the encrypted data from a MemoryStream to a byte array
+            byte[] cipherBytes = memoryStream.ToArray();
 
-                // Close both the MemoryStream and the CryptoStream
-                memoryStream.Close();
-                cryptoStream.Close();
+            // Close both the MemoryStream and the CryptoStream
+            memoryStream.Close();
+            cryptoStream.Close();
 
-                // Convert the encrypted byte array to a base64 encoded string
-                string cipherText = Convert.ToBase64String(cipherBytes, 0, cipherBytes.Length);
+            // Convert the encrypted byte array to a base64 encoded string
+            string cipherText = Convert.ToBase64String(cipherBytes, 0, cipherBytes.Length);
 
-                // Return the encrypted data as a string
-                return cipherText;
-            }
+            // Return the encrypted data as a string
+            return cipherText;
+        }
 
         public static string CBCDecryptStringFromBytes(string cipherText, string password)
         {
@@ -69,13 +77,11 @@ namespace Uzd_N2
             // with the specified key and IV. 
             Aes aes = Aes.Create();
 
-            byte[] IV = new byte[aes.BlockSize / 8];
-
             aes.Mode = CipherMode.CBC;
 
             // Set key and IV
-            byte[] aesKey = new byte[32];
-            Array.Copy(Key, 0, aesKey, 0, 32);
+            byte[] aesKey = new byte[16];
+            Array.Copy(Key, 0, aesKey, 0, 16);
             aes.Key = aesKey;
             aes.IV = IV;
 
@@ -127,9 +133,9 @@ namespace Uzd_N2
             Aes aes = Aes.Create();
 
             // Set key
-            byte[] aesKey = new byte[32];
+            byte[] aesKey = new byte[16];
 
-            Array.Copy(Key, 0, aesKey, 0, 32);
+            Array.Copy(Key, 0, aesKey, 0, 16);
             aes.Key = Key;
             aes.Key = aesKey;
 
@@ -181,8 +187,8 @@ namespace Uzd_N2
             aes.Mode = CipherMode.ECB;
 
             // Set key and IV
-            byte[] aesKey = new byte[32];
-            Array.Copy(Key, 0, aesKey, 0, 32);
+            byte[] aesKey = new byte[16];
+            Array.Copy(Key, 0, aesKey, 0, 16);
             aes.Key = aesKey;
 
             // Instantiate a new MemoryStream object to contain the encrypted bytes
@@ -225,11 +231,25 @@ namespace Uzd_N2
             return plainText;
 
         }
-        private static byte[] GetKey(string password)
+        /*private static byte[] GetKey(string password)
         {
             SHA256 mySHA256 = SHA256Managed.Create();
             byte[] key = mySHA256.ComputeHash(Encoding.ASCII.GetBytes(password));
             return key;
+        }*/
+        private static byte[] GetKey(string password)
+        {
+            var keyBytes = Encoding.UTF8.GetBytes(password);
+            using (var md5 = MD5.Create())
+            {
+                return md5.ComputeHash(keyBytes);
+            }
+        }
+        private static byte[] GenerateRandomBytes(int numberOfBytes)
+        {
+            var randomBytes = new byte[numberOfBytes];
+            Random.GetBytes(randomBytes);
+            return randomBytes;
         }
     }
 }
