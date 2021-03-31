@@ -3,13 +3,18 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using System.Security.Cryptography;
-using System.Text;
+
 
 namespace Uzd_N2
 {
     public partial class MainForm : Form
     {
+        private readonly UnicodeEncoding ByteConverter = new UnicodeEncoding();
+        private readonly RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
+        private byte[] plaintext;
+        private byte[] encryptedtext;
 
+        private readonly Repository repository = new Repository();
         public MainForm()
         {
             InitializeComponent();
@@ -17,36 +22,16 @@ namespace Uzd_N2
         
         private void button1_Click_1(object sender, EventArgs e)
         {
-            string encryptedText=" ";
-
-            if (radioButton1.Checked==true)
-                encryptedText = Repository.CBCEncryptStringToBytes(richTextBox1.Text, textBox2.Text);
-            else if (radioButton2.Checked == true)
-                encryptedText = Repository.ECBEncryptStringToBytes(richTextBox1.Text, textBox2.Text);
-            else
-                MessageBox.Show("Match the encrypting mode");
-            richTextBox2.Text = encryptedText;
-
-            StreamWriter f = new StreamWriter("encrypted.txt");
-            f.WriteLine(encryptedText);
-            f.Close();
+            plaintext = ByteConverter.GetBytes(richTextBox1.Text);
+            encryptedtext = repository.Encryption(plaintext, RSA.ExportParameters(false), false);
+            richTextBox2.Text = ByteConverter.GetString(encryptedtext);
+            
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            string encryptedText = File.ReadAllText("encrypted.txt");
-
-            string decryptedData=" ";
-
-            if (radioButton1.Checked==true) 
-                decryptedData = Repository.CBCDecryptStringFromBytes(encryptedText, textBox2.Text);
-            else if(radioButton2.Checked==true)
-                decryptedData = Repository.ECBDecryptStringFromBytes (encryptedText, textBox2.Text);
-            else
-                MessageBox.Show("Match the encrypting mode");
-            richTextBox2.Text = encryptedText;
-
-            richTextBox1.Text = decryptedData;
+            byte[] decryptedtex = repository.Decryption(encryptedtext, RSA.ExportParameters(true), false);
+            richTextBox1.Text = ByteConverter.GetString(decryptedtex);
         }
     }
 }
