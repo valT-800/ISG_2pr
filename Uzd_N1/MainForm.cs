@@ -11,8 +11,6 @@ namespace Uzd_N2
     {
         private readonly UnicodeEncoding ByteConverter = new UnicodeEncoding();
         private readonly RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
-        private byte[] plaintext;
-        private byte[] encryptedtext;
 
         private readonly Repository repository = new Repository();
         public MainForm()
@@ -22,16 +20,22 @@ namespace Uzd_N2
         
         private void button1_Click_1(object sender, EventArgs e)
         {
-            plaintext = ByteConverter.GetBytes(richTextBox1.Text);
-            encryptedtext = repository.Encryption(plaintext, RSA.ExportParameters(false), false);
-            richTextBox2.Text = ByteConverter.GetString(encryptedtext);
+            //var plaintext = ByteConverter.GetBytes(richTextBox1.Text);
+            //var encryptedtext = repository.Encryption(plaintext, RSA.ExportParameters(false), false);
+            var encryptedText = repository.Encryption(richTextBox1.Text);
+            richTextBox2.Text = encryptedText;
+            //richTextBox2.Text = ByteConverter.GetString(encryptedtext);
             
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            byte[] decryptedtex = repository.Decryption(encryptedtext, RSA.ExportParameters(true), false);
-            richTextBox1.Text = ByteConverter.GetString(decryptedtex);
+            //var encryptedtext = ByteConverter.GetBytes(richTextBox2.Text);
+            //byte[] decryptedtext = repository.Decryption(encryptedtext, RSA.ExportParameters(true), false);
+            var decryptedText = repository.Decryption(richTextBox2.Text);
+            richTextBox1.Text = decryptedText;
+            //richTextBox1.Text = ByteConverter.GetString(decryptedtext);
+
         }
     }
 }
