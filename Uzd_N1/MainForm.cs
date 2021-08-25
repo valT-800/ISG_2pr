@@ -11,30 +11,23 @@ namespace Uzd_N3
     {
         private readonly UnicodeEncoding ByteConverter = new UnicodeEncoding();
         private readonly RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
-
+        string fileName = "encrypted.txt";
         private readonly RSA rsa = new RSA();
         public MainForm()
         {
             InitializeComponent();
         }
         
-        private void button1_Click_1(object sender, EventArgs e)
+        private void encryptButton_Click(object sender, EventArgs e)
         {
-            //var plaintext = ByteConverter.GetBytes(richTextBox1.Text);
-            //var encryptedtext = repository.Encryption(plaintext, RSA.ExportParameters(false), false);
-            var encryptedText = rsa.Encryption(richTextBox1.Text);
-            richTextBox2.Text = encryptedText;
-            //richTextBox2.Text = ByteConverter.GetString(encryptedtext);
+            var plainText = ByteConverter.GetBytes(richTextBox1.Text);
+            var encryptedText = rsa.Encryption(plainText, RSA.ExportParameters(false), false);
+            richTextBox2.Text = Convert.ToBase64String(encryptedText, Base64FormattingOptions.InsertLineBreaks);
             
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void decryptButton_Click(object sender, EventArgs e)
         {
-            //var encryptedtext = ByteConverter.GetBytes(richTextBox2.Text);
-            //byte[] decryptedtext = repository.Decryption(encryptedtext, RSA.ExportParameters(true), false);
-            var decryptedText = rsa.Decryption(richTextBox2.Text);
-            richTextBox1.Text = decryptedText;
-            //richTextBox1.Text = ByteConverter.GetString(decryptedtext);
 
         }
     }

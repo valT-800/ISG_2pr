@@ -12,7 +12,7 @@ namespace Uzd_N3
     class RSA
     {
 
-        static public byte[] Encryption(byte[] Data, RSAParameters RSAKey, bool DoOAEPPadding)
+        public byte[] Encryption(byte[] Data, RSAParameters RSAKey, bool DoOAEPPadding)
         {
             try
             {
@@ -32,7 +32,7 @@ namespace Uzd_N3
             }
         }
 
-        static public byte[] Decryption(byte[] Data, RSAParameters RSAKey, bool DoOAEPPadding)
+        public byte[] Decryption(byte[] Data, RSAParameters RSAKey, bool DoOAEPPadding)
         {
             try
             {
