@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace Uzd_N2
+namespace Uzd_N3
 {
     static class Program
     {

@@ -5,14 +5,14 @@ using System.Windows.Forms;
 using System.Security.Cryptography;
 
 
-namespace Uzd_N2
+namespace Uzd_N3
 {
     public partial class MainForm : Form
     {
         private readonly UnicodeEncoding ByteConverter = new UnicodeEncoding();
         private readonly RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
 
-        private readonly Repository repository = new Repository();
+        private readonly RSA rsa = new RSA();
         public MainForm()
         {
             InitializeComponent();
@@ -22,7 +22,7 @@ namespace Uzd_N2
         {
             //var plaintext = ByteConverter.GetBytes(richTextBox1.Text);
             //var encryptedtext = repository.Encryption(plaintext, RSA.ExportParameters(false), false);
-            var encryptedText = repository.Encryption(richTextBox1.Text);
+            var encryptedText = rsa.Encryption(richTextBox1.Text);
             richTextBox2.Text = encryptedText;
             //richTextBox2.Text = ByteConverter.GetString(encryptedtext);
             
@@ -32,7 +32,7 @@ namespace Uzd_N2
         {
             //var encryptedtext = ByteConverter.GetBytes(richTextBox2.Text);
             //byte[] decryptedtext = repository.Decryption(encryptedtext, RSA.ExportParameters(true), false);
-            var decryptedText = repository.Decryption(richTextBox2.Text);
+            var decryptedText = rsa.Decryption(richTextBox2.Text);
             richTextBox1.Text = decryptedText;
             //richTextBox1.Text = ByteConverter.GetString(decryptedtext);
 
