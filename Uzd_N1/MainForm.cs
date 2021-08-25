@@ -32,6 +32,8 @@ namespace Uzd_N3
             string asd = File.ReadAllText(fileName);
             byte[] src = Convert.FromBase64String(asd);
 
+            byte[] decryptedText = rsa.Decryption(src, RSA.ExportParameters(true), false);
+            
         }
     }
 }
