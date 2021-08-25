@@ -29,6 +29,8 @@ namespace Uzd_N3
 
         private void decryptButton_Click(object sender, EventArgs e)
         {
+            string asd = File.ReadAllText(fileName);
+            byte[] src = Convert.FromBase64String(asd);
 
         }
     }
