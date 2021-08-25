@@ -32,7 +32,25 @@ namespace Uzd_N3
             }
         }
 
+        static public byte[] Decryption(byte[] Data, RSAParameters RSAKey, bool DoOAEPPadding)
+        {
+            try
+            {
+                byte[] decryptedData;
+                using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider())
+                {
+                    RSA.ImportParameters(RSAKey);
+                    decryptedData = RSA.Decrypt(Data, DoOAEPPadding);
+                }
+                return decryptedData;
+            }
+            catch (CryptographicException e)
+            {
+                Console.WriteLine(e.ToString());
 
+                return null;
+            }
+        }
 
     }
 }
