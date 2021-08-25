@@ -33,7 +33,7 @@ namespace Uzd_N3
             byte[] src = Convert.FromBase64String(asd);
 
             byte[] decryptedText = rsa.Decryption(src, RSA.ExportParameters(true), false);
-            
+            richTextBox3.Text = ByteConverter.GetString(decryptedText);
         }
     }
 }
